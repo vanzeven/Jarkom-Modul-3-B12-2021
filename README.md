@@ -1,6 +1,7 @@
 # Jarkom-Modul-3-B12-2021
 
 Anggota: Faisal Reza M (05111940000009)
+
 Spesifikasi: harus ada screenshot, cara pengerjaan, kendala
 
 ### Network Configuration tiap node
@@ -71,11 +72,20 @@ iface eth0 inet static
 ### Nomor 1
 Luffy bersama Zoro berencana membuat peta tersebut dengan kriteria EniesLobby sebagai DNS Server, Jipangu sebagai DHCP Server, Water7 sebagai Proxy Server
 
-Pertama, buat topologi seperti di bawah (maaf jika bentuknya tidak persis seperti yang disuruh, karena saya harus memastikan agar semua node bisa cukup dalam layar meskipun window di-minimize dan tidak perlu scroll), dan pastikan bahwa semua yang ada di https://github.com/arsitektur-jaringan-komputer/Modul-Jarkom/blob/master/Modul-3/prerequisite.md sudah dilakukan
+Pertama, buat topologi seperti di bawah (maaf jika bentuknya tidak persis seperti yang disuruh, karena saya harus memastikan agar semua node bisa cukup dalam layar meskipun window di-minimize dan tidak perlu scroll), dan pastikan bahwa semua yang ada di https://github.com/arsitektur-jaringan-komputer/Modul-Jarkom/blob/master/Modul-3/prerequisite.md#inget-ini-yaa-sudah dilakukan
 
 !gambar topologi dengan window minimized
 
-
+isi script.sh di Jipangu
+```
+echo nameserver 192.168.122.1 > /etc/resolv.conf
+apt update
+apt install isc-dhcp-server -y
+dhcpd --version
+bash copy.sh
+```
+install isc-dhcp-server, lalu panggil copy.sh
+isi copy.sh
 
 ### Nomor 2
 Foosha sebagai DHCP Relay
@@ -87,7 +97,7 @@ apt install isc-dhcp-relay -y
 ```
 Saat kita awal2 menginstall isc-dhsc-relay, installer akan menanyakan konfigurasi yang akan kita gunakan, kita harus menginputkan ip DHCP Server (Jipangu): 10.13.2.4
 
-Untuk 2 pertanyaan lainnya, enter enter saja agar relay mendeteksi otomatis config yang dibutuhkan
+Untuk 2 pertanyaan lainnya, tekan enter saja agar relay mendeteksi otomatis config yang dibutuhkan.
 
 ### Nomor 3
 Semua client yang ada HARUS menggunakan konfigurasi IP dari DHCP Server.
