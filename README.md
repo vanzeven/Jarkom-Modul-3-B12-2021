@@ -85,7 +85,54 @@ dhcpd --version
 bash copy.sh
 ```
 install isc-dhcp-server, lalu panggil copy.sh
+
 isi copy.sh
+```
+cp isc-dhcp-server /etc/default/
+cp dhcpd.conf /etc/dhcp/
+service isc-dhcp-server restart
+```
+
+isi isc-dhcp-server
+```
+# On what interfaces should the DHCP server (dhcpd) serve DHCP requests?
+#       Separate multiple interfaces with spaces, e.g. "eth0 eth1".
+INTERFACES="eth0"
+```
+
+isi dhcpd.conf
+```
+subnet 10.13.2.0 netmask 255.255.255.0 {
+}
+
+subnet 10.13.1.0 netmask 255.255.255.0 {
+  range 10.13.1.20 10.13.1.99;
+  range 10.13.1.150 10.13.1.169;
+  option routers 10.13.1.1;
+  option broadcast-address 10.13.1.255;
+  option domain-name-servers 10.13.2.4, 10.13.2.2;
+  default-lease-time 360;
+  max-lease-time 7200;
+}
+
+subnet 10.13.3.0 netmask 255.255.255.0 {
+  range 10.13.3.30 10.13.3.50;
+  option routers 10.13.3.1;
+  option broadcast-address 10.13.3.255;
+  option domain-name-servers 10.13.2.4, 10.13.2.2;
+  default-lease-time 720;
+  max-lease-time 7200;
+}
+
+host Skypie {
+    hardware ethernet 1e:59:f1:4f:80:46;
+    fixed-address 10.13.3.69;
+}
+```
+
+- subnet 10.13.2.0: karena DHCP server kita berada di bawah switch 2
+- untuk detail konfigurasi lain akan dijelaskan di nomor yang sesuai
+- untuk detail node Enies dan Water7 akan dijelaskan di nomor yang sesuai
 
 ### Nomor 2
 Foosha sebagai DHCP Relay
@@ -97,23 +144,81 @@ apt install isc-dhcp-relay -y
 ```
 Saat kita awal2 menginstall isc-dhsc-relay, installer akan menanyakan konfigurasi yang akan kita gunakan, kita harus menginputkan ip DHCP Server (Jipangu): 10.13.2.4
 
-Untuk 2 pertanyaan lainnya, tekan enter saja agar relay mendeteksi otomatis config yang dibutuhkan.
+Lalu, installer akan menanyakan interface mana yang ingin kita layani, kita ketikkan: `eth1 eth2 eth3`, karena client dan dhcp server kita ada di interface tersebut
+
+Untuk pertanyaan terakhir, tekan enter saja karena kita tidak membutuhkan parameter khusus
 
 ### Nomor 3
 Semua client yang ada HARUS menggunakan konfigurasi IP dari DHCP Server.
 Client yang melalui Switch1 mendapatkan range IP dari [prefix IP].1.20 - [prefix IP].1.99 dan [prefix IP].1.150 - [prefix IP].1.169
 
+kita gunakan network config berikut pada client agar mereka dapat ip dari dhcp server
+```
+auto eth0
+iface eth0 inet dhcp
+```
+lalu kita definisikan 2 buah range pada subnet 10.13.1.0
+```
+subnet 10.13.1.0 netmask 255.255.255.0 {
+  range 10.13.1.20 10.13.1.99;
+  range 10.13.1.150 10.13.1.169;
+..}
+```
+
 ### Nomor 4
 Client yang melalui Switch3 mendapatkan range IP dari [prefix IP].3.30 - [prefix IP].3.50
+
+hal yang sama juga kita lakukan untuk subnet 10.13.3.0
+```
+subnet 10.13.3.0 netmask 255.255.255.0 {
+  range 10.13.3.30 10.13.3.50;
+..}
+```
 
 ### Nomor 5
 Client mendapatkan DNS dari EniesLobby dan client dapat terhubung dengan internet melalui DNS tersebut.
 
+kita definisikan option dns pada subnet 1.0 dan 3.0
+```
+subnet .. {
+	..
+	option domain-name-servers 10.13.2.2;
+	..
+}
+```
+
 ### Nomor 6
 Lama waktu DHCP server meminjamkan alamat IP kepada Client yang melalui Switch1 selama 6 menit sedangkan pada client yang melalui Switch3 selama 12 menit. Dengan waktu maksimal yang dialokasikan untuk peminjaman alamat IP selama 120 menit
 
+- 6 menit = 360 detik
+- 12 menit = 720 detik
+- 12 menit = 7200 detik
+
+kita letakkan angka tersebut pada config di jipangu
+```
+subnet 10.13.1.0 netmask 255.255.255.0 {
+  ..
+  default-lease-time 360;
+  max-lease-time 7200;
+}
+
+subnet 10.13.3.0 netmask 255.255.255.0 {
+  ..
+  default-lease-time 720;
+  max-lease-time 7200;
+}
+```
+
 ### Nomor 7
 Luffy dan Zoro berencana menjadikan Skypie sebagai server untuk jual beli kapal yang dimilikinya dengan alamat IP yang tetap dengan IP [prefix IP].3.69
+
+kita buat block host untuk skypie di dhcpd.conf (samakan hweth dengan yang telah kita set sebelumnya di network config)
+```
+host Skypie {
+    hardware ethernet 1e:59:f1:4f:80:46;
+    fixed-address 10.13.3.69;
+}
+```
 
 ### Nomor 8
 Loguetown digunakan sebagai client Proxy agar transaksi jual beli dapat terjamin keamanannya, juga untuk mencegah kebocoran data transaksi.
