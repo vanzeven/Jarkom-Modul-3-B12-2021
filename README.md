@@ -356,18 +356,23 @@ delay_access 2 deny all
 untuk setup server skypie, kurang lebih sama dengan https://github.com/vanzeven/Jarkom-Modul-2-B12-2021#8-setelah-melakukan-konfigurasi-server-maka-dilakukan-konfigurasi-webserver-pertama-dengan-webserver-wwwfrankyyyycom-pertama-luffy-membutuhkan-webserver-dengan-documentroot-pada-varwwwfrankyyyycom ,hanya saja isi folder diganti, download dengan `wget https://raw.githubusercontent.com/FeinardSlim/Praktikum-Modul-2-Jarkom/main/super.franky.zip`
 
 aktifkan proxy, lalu coba akses google menggunakan lynx di loguetown
+
 ![image](https://user-images.githubusercontent.com/11045113/141646950-265a0fca-af6d-46d6-b0de-ecc2f1b7f967.png)
 
 akan terredirect ke super franky
+
 ![image](https://user-images.githubusercontent.com/11045113/141647088-ff2520e8-12f2-4e2c-a089-5804c836d4a0.png)
 
 mencoba menggunakan user luffy
+
 ![image](https://user-images.githubusercontent.com/11045113/141647107-9bf6094c-9e1b-4db8-ac78-57f0d57cae58.png)
 
 jika mendownload gambar, maka kecepatannya akan di-throttle
+
 ![image](https://user-images.githubusercontent.com/11045113/141647114-5d2af2a7-3a99-4bbc-a04a-b8cd7f0892ee.png)
 
 namun, jika menggunakan user zoro, mendownload gambar sebesar 1.8M pun akan lancar
+
 ![image](https://user-images.githubusercontent.com/11045113/141647141-e1d06484-6494-47cf-90a8-07cad4101ce4.png)
 
 ### Kendala
