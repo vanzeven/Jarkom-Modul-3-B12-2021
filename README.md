@@ -72,9 +72,9 @@ iface eth0 inet static
 ### Nomor 1
 Luffy bersama Zoro berencana membuat peta tersebut dengan kriteria EniesLobby sebagai DNS Server, Jipangu sebagai DHCP Server, Water7 sebagai Proxy Server
 
-Pertama, buat topologi seperti di bawah (maaf jika bentuknya tidak persis seperti yang disuruh, karena saya harus memastikan agar semua node bisa cukup dalam layar meskipun window di-minimize dan tidak perlu scroll), dan pastikan bahwa semua yang ada di https://github.com/arsitektur-jaringan-komputer/Modul-Jarkom/blob/master/Modul-3/prerequisite.md#inget-ini-yaa- sudah dilakukan
+Pertama, buat topologi seperti di bawah (maaf jika bentuknya tidak persis seperti yang disuruh, karena saya harus memastikan agar semua node bisa cukup dalam layar meskipun window restore-down dan tidak perlu scroll), dan pastikan bahwa semua yang ada di https://github.com/arsitektur-jaringan-komputer/Modul-Jarkom/blob/master/Modul-3/prerequisite.md#inget-ini-yaa- sudah dilakukan
 
-!gambar topologi dengan window minimized
+!gambar topologi dengan window restore down
 
 isi script.sh di Jipangu
 ```
@@ -141,12 +141,15 @@ isi script.sh di Foosha
 ```
 apt update
 apt install isc-dhcp-relay -y
+echo 'net.ipv4.ip_forward=1'>/etc/sysctl.conf
 ```
 Saat kita awal2 menginstall isc-dhsc-relay, installer akan menanyakan konfigurasi yang akan kita gunakan, kita harus menginputkan ip DHCP Server (Jipangu): 10.13.2.4
 
 Lalu, installer akan menanyakan interface mana yang ingin kita layani, kita ketikkan: `eth1 eth2 eth3`, karena client dan dhcp server kita ada di interface tersebut
 
 Untuk pertanyaan terakhir, tekan enter saja karena kita tidak membutuhkan parameter khusus
+
+Lalu baris terakhir akan menyalakan kemampuan ip_forward di sysctl.conf
 
 ### Nomor 3
 Semua client yang ada HARUS menggunakan konfigurasi IP dari DHCP Server.
@@ -174,6 +177,7 @@ subnet 10.13.3.0 netmask 255.255.255.0 {
   range 10.13.3.30 10.13.3.50;
 ..}
 ```
+!ss loguetown leasing ip
 
 ### Nomor 5
 Client mendapatkan DNS dari EniesLobby dan client dapat terhubung dengan internet melalui DNS tersebut.
@@ -187,12 +191,23 @@ subnet .. {
 }
 ```
 
+pastikan juga bahwa dns forwarder sudah di-set di Enies (samakan dengan foosha), di /etc/bind/named.conf.options
+```
+options {
+        directory "/var/cache/bind";
+        forwarders {
+                192.168.122.1;
+        };
+...}
+```
+!ss ping ubuntu.com|
+
 ### Nomor 6
 Lama waktu DHCP server meminjamkan alamat IP kepada Client yang melalui Switch1 selama 6 menit sedangkan pada client yang melalui Switch3 selama 12 menit. Dengan waktu maksimal yang dialokasikan untuk peminjaman alamat IP selama 120 menit
 
 - 6 menit = 360 detik
 - 12 menit = 720 detik
-- 12 menit = 7200 detik
+- 120 menit = 7200 detik
 
 kita letakkan angka tersebut pada config di jipangu
 ```
@@ -219,25 +234,131 @@ host Skypie {
     fixed-address 10.13.3.69;
 }
 ```
+!ss skypie leasing ip
 
-### Nomor 8
-Loguetown digunakan sebagai client Proxy agar transaksi jual beli dapat terjamin keamanannya, juga untuk mencegah kebocoran data transaksi.
-Pada Loguetown, proxy harus bisa diakses dengan nama jualbelikapal.yyy.com dengan port yang digunakan adalah 5000
+### Nomor 8-13
+Pada Loguetown, proxy harus bisa diakses dengan nama jualbelikapal.yyy.com dengan port yang digunakan adalah 5000 (8). Agar transaksi jual beli lebih aman dan pengguna website ada dua orang, proxy dipasang autentikasi user proxy dengan enkripsi MD5 dengan dua username, yaitu luffybelikapalyyy dengan password luffy_yyy dan zorobelikapalyyy dengan password zoro_yyy (9). Transaksi jual beli tidak dilakukan setiap hari, oleh karena itu akses internet dibatasi hanya dapat diakses setiap hari Senin-Kamis pukul 07.00-11.00 dan setiap hari Selasa-Jum’at pukul 17.00-03.00 keesokan harinya (sampai Sabtu pukul 03.00) (10).
 
-### Nomor 9
-Agar transaksi jual beli lebih aman dan pengguna website ada dua orang, proxy dipasang autentikasi user proxy dengan enkripsi MD5 dengan dua username, yaitu luffybelikapalyyy dengan password luffy_yyy dan zorobelikapalyyy dengan password zoro_yyy
+Agar transaksi bisa lebih fokus berjalan, maka dilakukan redirect website agar mudah mengingat website transaksi jual beli kapal. Setiap mengakses google.com, akan diredirect menuju super.franky.yyy.com dengan website yang sama pada soal shift modul 2. Web server super.franky.yyy.com berada pada node Skypie (11).
 
-### Nomor 10
-Transaksi jual beli tidak dilakukan setiap hari, oleh karena itu akses internet dibatasi hanya dapat diakses setiap hari Senin-Kamis pukul 07.00-11.00 dan setiap hari Selasa-Jum’at pukul 17.00-03.00 keesokan harinya (sampai Sabtu pukul 03.00)
+Saatnya berlayar! Luffy dan Zoro akhirnya memutuskan untuk berlayar untuk mencari harta karun di super.franky.yyy.com. Tugas pencarian dibagi menjadi dua misi, Luffy bertugas untuk mendapatkan gambar (.png, .jpg), sedangkan Zoro mendapatkan sisanya. Karena Luffy orangnya sangat teliti untuk mencari harta karun, ketika ia berhasil mendapatkan gambar, ia mendapatkan gambar dan melihatnya dengan kecepatan 10 kbps (12). Sedangkan, Zoro yang sangat bersemangat untuk mencari harta karun, sehingga kecepatan kapal Zoro tidak dibatasi ketika sudah mendapatkan harta yang diinginkannya (13).
 
-### Nomor 11
-Agar transaksi bisa lebih fokus berjalan, maka dilakukan redirect website agar mudah mengingat website transaksi jual beli kapal. Setiap mengakses google.com, akan diredirect menuju super.franky.yyy.com dengan website yang sama pada soal shift modul 2. Web server super.franky.yyy.com berada pada node Skypie
+EniesLobby: membuat jualbelikapal.b12.com script.sh
+```
+echo nameserver 192.168.122.1 > /etc/resolv.conf
+apt update
+apt install bind9 -y
+mkdir /etc/bind/kaizoku
+bash copy.sh
+```
 
-### Nomor 12
-Saatnya berlayar! Luffy dan Zoro akhirnya memutuskan untuk berlayar untuk mencari harta karun di super.franky.yyy.com. Tugas pencarian dibagi menjadi dua misi, Luffy bertugas untuk mendapatkan gambar (.png, .jpg), sedangkan Zoro mendapatkan sisanya. Karena Luffy orangnya sangat teliti untuk mencari harta karun, ketika ia berhasil mendapatkan gambar, ia mendapatkan gambar dan melihatnya dengan kecepatan 10 kbps
+isi copy.sh
+```
+cp named.conf.local /etc/bind
+cp named.conf.options /etc/bind
+cp franky.b12.com /etc/bind/kaizoku
+cp jualbelikapal.b12.com /etc/bind/kaizoku
+service bind9 restart
+```
 
-### Nomor 13
-Sedangkan, Zoro yang sangat bersemangat untuk mencari harta karun, sehingga kecepatan kapal Zoro tidak dibatasi ketika sudah mendapatkan harta yang diinginkannya
+isi jualbelikapal.b12.com
+```
+;
+; BIND data file for local loopback interface
+;
+$TTL    604800
+@       IN      SOA     jualbelikapal.b12.com. root.jualbelikapal.b12.com. (
+                              2         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+@       IN      NS      jualbelikapal.b12.com.
+@       IN      A       10.13.2.3       ;ip water7
+www     IN      CNAME   jualbelikapal.b12.com.
+```
+
+Water7: isi script.sh
+```
+echo nameserver 192.168.122.1 > /etc/resolv.conf
+apt update
+apt install apache2-utils squid -y
+bash copy.sh
+```
+squid adalah proxy server dan apache2-utils digunakan untuk htpassword
+
+isi copy.sh
+```
+cp squid.conf /etc/squid/
+cp acl.conf /etc/squid/
+cp acl-bandwidth.conf /etc/squid/
+htpasswd -cmb /etc/squid/passwd luffybelikapalb12 luffy_b12
+htpasswd -mb /etc/squid/passwd zorobelikapalb12 zoro_b12
+htpasswd -mb /etc/squid/passwd a a
+service squid restart
+```
+- kita gunakan htpasswd dengan param -c untuk membuat file baru
+- param m untuk menggunakan md5
+- param b agar kita dapat sekaligus mengetikkan username dan password
+
+isi squid.conf
+```
+include /etc/squid/acl.conf
+include /etc/squid/acl-bandwidth.conf
+
+http_port 5000
+visible_hostname jualbelikapal.b12.com
+#^NO8
+dns_nameservers 10.13.2.2
+#agar tidak kena mercusuar
+
+acl redir dstdomain google.com
+http_access deny redir
+deny_info http://super.franky.b12.com redir
+#^NO11
+
+auth_param basic program /usr/lib/squid/basic_ncsa_auth /etc/squid/passwd
+auth_param basic realm Proxy
+auth_param basic casesensitive on
+acl USERS proxy_auth REQUIRED
+#^NO9
+http_access allow AVAILABLE_WORKING USERS
+#no10
+```
+
+isi acl.conf
+```
+acl AVAILABLE_WORKING time MTWH 07:00-11:00
+acl AVAILABLE_WORKING time TWHF 17:00-23:59
+acl AVAILABLE_WORKING time WHFA 00:00-03:00
+```
+
+isi acl-bandwidth.conf
+```
+acl download url_regex -i \.jpg$ \.png$
+
+auth_param basic program /usr/lib/squid/basic_ncsa_auth /etc/squid/passwd
+
+acl luffy proxy_auth luffybelikapalb12
+acl zoro proxy_auth zorobelikapalb12
+
+delay_pools 2
+delay_class 1 1
+delay_parameters 1 1250/1250
+delay_access 1 deny zoro
+delay_access 1 allow download
+delay_access 1 deny all
+
+delay_class 2 1
+delay_parameters 2 -1/-1
+delay_access 2 allow zoro
+delay_access 2 deny luffy
+delay_access 2 deny all
+```
+untuk setup server skypie, kurang lebih sama dengan https://github.com/vanzeven/Jarkom-Modul-2-B12-2021#8-setelah-melakukan-konfigurasi-server-maka-dilakukan-konfigurasi-webserver-pertama-dengan-webserver-wwwfrankyyyycom-pertama-luffy-membutuhkan-webserver-dengan-documentroot-pada-varwwwfrankyyyycom ,hanya saja isi folder diganti, download dengan `wget https://raw.githubusercontent.com/FeinardSlim/Praktikum-Modul-2-Jarkom/main/super.franky.zip`
+
+!ss redirect proxy luffy
 
 ### Kendala
 - Loguetown saya tiba2 tidak bisa mengakeses ubuntu.com, sehingga saya menghabiskan waktu dan energi cukup lama untuk men-debugnya
