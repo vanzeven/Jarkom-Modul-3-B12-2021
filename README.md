@@ -50,7 +50,6 @@ iface eth0 inet static
 ```
 
 **Water7**
-
 ```
 auto eth0
 iface eth0 inet static
@@ -60,7 +59,6 @@ iface eth0 inet static
 ```
 
 **Jipangu**
-
 ```
 auto eth0
 iface eth0 inet static
@@ -74,7 +72,7 @@ Luffy bersama Zoro berencana membuat peta tersebut dengan kriteria EniesLobby se
 
 Pertama, buat topologi seperti di bawah (maaf jika bentuknya tidak persis seperti yang disuruh, karena saya harus memastikan agar semua node bisa cukup dalam layar meskipun window restore-down dan tidak perlu scroll), dan pastikan bahwa semua yang ada di https://github.com/arsitektur-jaringan-komputer/Modul-Jarkom/blob/master/Modul-3/prerequisite.md#inget-ini-yaa- sudah dilakukan
 
-!gambar topologi dengan window restore down
+![image](https://user-images.githubusercontent.com/11045113/141646743-808ef280-002e-456d-b0e2-70198812fd2b.png)
 
 isi script.sh di Jipangu
 ```
@@ -167,6 +165,7 @@ subnet 10.13.1.0 netmask 255.255.255.0 {
   range 10.13.1.150 10.13.1.169;
 ..}
 ```
+![image](https://user-images.githubusercontent.com/11045113/141646838-a18970e3-03e8-498f-b1c4-7c33a37d76e8.png)
 
 ### Nomor 4
 Client yang melalui Switch3 mendapatkan range IP dari [prefix IP].3.30 - [prefix IP].3.50
@@ -177,7 +176,6 @@ subnet 10.13.3.0 netmask 255.255.255.0 {
   range 10.13.3.30 10.13.3.50;
 ..}
 ```
-!ss loguetown leasing ip
 
 ### Nomor 5
 Client mendapatkan DNS dari EniesLobby dan client dapat terhubung dengan internet melalui DNS tersebut.
@@ -200,7 +198,6 @@ options {
         };
 ...}
 ```
-!ss ping ubuntu.com|
 
 ### Nomor 6
 Lama waktu DHCP server meminjamkan alamat IP kepada Client yang melalui Switch1 selama 6 menit sedangkan pada client yang melalui Switch3 selama 12 menit. Dengan waktu maksimal yang dialokasikan untuk peminjaman alamat IP selama 120 menit
@@ -234,7 +231,7 @@ host Skypie {
     fixed-address 10.13.3.69;
 }
 ```
-!ss skypie leasing ip
+![image](https://user-images.githubusercontent.com/11045113/141646902-1dc33896-bfeb-4e30-a638-b217930fb53c.png)
 
 ### Nomor 8-13
 Pada Loguetown, proxy harus bisa diakses dengan nama jualbelikapal.yyy.com dengan port yang digunakan adalah 5000 (8). Agar transaksi jual beli lebih aman dan pengguna website ada dua orang, proxy dipasang autentikasi user proxy dengan enkripsi MD5 dengan dua username, yaitu luffybelikapalyyy dengan password luffy_yyy dan zorobelikapalyyy dengan password zoro_yyy (9). Transaksi jual beli tidak dilakukan setiap hari, oleh karena itu akses internet dibatasi hanya dapat diakses setiap hari Senin-Kamis pukul 07.00-11.00 dan setiap hari Selasa-Jum’at pukul 17.00-03.00 keesokan harinya (sampai Sabtu pukul 03.00) (10).
@@ -358,7 +355,20 @@ delay_access 2 deny all
 ```
 untuk setup server skypie, kurang lebih sama dengan https://github.com/vanzeven/Jarkom-Modul-2-B12-2021#8-setelah-melakukan-konfigurasi-server-maka-dilakukan-konfigurasi-webserver-pertama-dengan-webserver-wwwfrankyyyycom-pertama-luffy-membutuhkan-webserver-dengan-documentroot-pada-varwwwfrankyyyycom ,hanya saja isi folder diganti, download dengan `wget https://raw.githubusercontent.com/FeinardSlim/Praktikum-Modul-2-Jarkom/main/super.franky.zip`
 
-!ss redirect proxy luffy
+aktifkan proxy, lalu coba akses google menggunakan lynx di loguetown
+![image](https://user-images.githubusercontent.com/11045113/141646950-265a0fca-af6d-46d6-b0de-ecc2f1b7f967.png)
+
+akan terredirect ke super franky
+![image](https://user-images.githubusercontent.com/11045113/141647088-ff2520e8-12f2-4e2c-a089-5804c836d4a0.png)
+
+mencoba menggunakan user luffy
+![image](https://user-images.githubusercontent.com/11045113/141647107-9bf6094c-9e1b-4db8-ac78-57f0d57cae58.png)
+
+jika mendownload gambar, maka kecepatannya akan di-throttle
+![image](https://user-images.githubusercontent.com/11045113/141647114-5d2af2a7-3a99-4bbc-a04a-b8cd7f0892ee.png)
+
+namun, jika menggunakan user zoro, mendownload gambar sebesar 1.8M pun akan lancar
+![image](https://user-images.githubusercontent.com/11045113/141647141-e1d06484-6494-47cf-90a8-07cad4101ce4.png)
 
 ### Kendala
 - Loguetown saya tiba2 tidak bisa mengakeses ubuntu.com, sehingga saya menghabiskan waktu dan energi cukup lama untuk men-debugnya
