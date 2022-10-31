@@ -324,6 +324,7 @@ http_access allow AVAILABLE_WORKING USERS
 #no10
 ```
 
+Transaksi jual beli tidak dilakukan setiap hari, oleh karena itu akses internet dibatasi hanya dapat diakses setiap hari Senin-Kamis pukul 07.00-11.00 dan setiap hari Selasa-Jum’at pukul 17.00-03.00 keesokan harinya (sampai Sabtu pukul 03.00)
 isi acl.conf
 ```
 acl AVAILABLE_WORKING time MTWH 07:00-11:00
